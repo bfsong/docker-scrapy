@@ -1,12 +1,18 @@
 FROM alpine:latest
 
-RUN apk -U add \
+COPY repositories /etc/apk/repositories
+COPY pip.conf /root/.pip/pip.conf
+
+RUN apk update \
+    && apk -U --no-cache add --virtual build-dependencies \
         gcc \
         libffi-dev \
         libxml2-dev \
         libxslt-dev \
         musl-dev \
-        openssl-dev \
+	mysql-client \
+	mariadb-dev \
+	build-base \
         python-dev \
         py-imaging \
         py-pip \
@@ -14,7 +20,7 @@ RUN apk -U add \
     && update-ca-certificates \
     && rm -rf /var/cache/apk/* \
     && pip install --upgrade pip \
-    && pip install Scrapy
+    && pip install --no-cache-dir mysql-python Scrapy scrapy-redis 
 
 WORKDIR /runtime/app
 
